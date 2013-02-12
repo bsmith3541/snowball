@@ -1,0 +1,23 @@
+@import "bootstrap";
+@import "bootstrap-responsive";
+
+body {
+	background-image:'../images/snowball.jpg';
+  background: url('/assets/snowball.jpg');
+}
+
+.container-responsive#main {
+  background-color: transparent;
+  opacity: 0.9;
+  height:60%;
+  width:40%;
+  margin: auto;
+  padding: 20px;
+  margin-top: 100px;
+  border-radius: 10px;
+  text-align:center;
+}
+
+h4 {
+  margin: 10px;
+}

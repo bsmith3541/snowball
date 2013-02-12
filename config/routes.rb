@@ -1,4 +1,7 @@
 Snowball::Application.routes.draw do
+  root to: 'static_pages#home'
+
+  match "/auth/:provider/callback" => "sessions#create"  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
