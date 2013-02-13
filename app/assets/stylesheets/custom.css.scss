@@ -6,7 +6,7 @@ body {
   background: url('/assets/snowball.jpg');
 }
 
-.container-responsive#main {
+/*.container-responsive*/#main {
   background-color: transparent;
   opacity: 0.9;
   height:60%;
@@ -16,8 +16,11 @@ body {
   margin-top: 100px;
   border-radius: 10px;
   text-align:center;
+  font-color: white;
 }
 
+/* Text */
+
 h4 {
-  margin: 10px;
+  margin: 20px;
 }
