@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController  
+	require 'open-uri'
   def create  
     auth = request.env["omniauth.auth"]  
     user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)  
@@ -31,16 +32,37 @@ class SessionsController < ApplicationController
 		# Figure out how to save the data for each blog so that
 		# some library can read it later for the visualization
 		f = File.open("blogs.net", 'w+') 
+		all_posts = Array.new
+		posts.push
+		
 
-		for blog in user.following
-			posts = client.posts(blog["name"])
-			posts = posts["posts"]
-			f.write(blog["name"] + "\n")
-			for post in posts
-				f.write("\t" + post["short_url"] + "\n")
+		# look at the efficiency in terms of the potential viewers based on the 
+		# number of blogs your followers are following
+		# this would also be a measurement of how influential you are
+		# how many of the people that could possibly be affected by a post are actually
+		# being influenced by a post (at least in terms of likes/reblogs)? 
+		3.times do |j|
+			for blog in user.following(:offset => j * 21)
+				puts "analyzing: " + blog["name"]
+				5.times do |i|
+					posts = client.posts(blog["name"], :limit => 20, :offset => i*20)
+					posts = posts["posts"]
+					f.write(blog["name"] + "\n")
+					for post in posts
+						doc = Nokogiri::HTML(open(post["short_url"]))
+						#puts doc.css('div#post_notes').to_yaml
+						#puts doc.to_html
+						#puts post["notes_info"]
+						all_posts.push("\t"+ post["short_url"] "\n")
+					end
+				end
+				f.write(all_posts)
+				all_posts = Array.new
 			end
 		end
+
 		f.close
+	
 
     redirect_to root_url, :notice => "Signed in!"  
   end  
