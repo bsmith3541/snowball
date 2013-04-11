@@ -8,9 +8,14 @@ gem 'rails', '3.2.8'
 gem 'sqlite3'
 gem 'bootstrap-sass', '2.0.0'
 gem 'jquery-rails', '2.0.2'
-#gem 'tumblr'
 gem 'omniauth-tumblr'
 gem 'tumblr_client'
+
+# for crawling 
+require 'mechanize'
+
+# for parsing
+require 'nokogiri'
 
 
 
