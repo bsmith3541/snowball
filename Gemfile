@@ -6,9 +6,12 @@ gem 'rails', '3.2.8'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
-gem 'omniauth-tumblr'
 gem 'bootstrap-sass', '2.0.0'
 gem 'jquery-rails', '2.0.2'
+#gem 'tumblr'
+gem 'omniauth-tumblr'
+gem 'tumblr_client'
+
 
 
 # Gems used only for assets and not required
