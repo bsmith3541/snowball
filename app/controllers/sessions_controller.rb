@@ -25,15 +25,17 @@ class SessionsController < ApplicationController
 		blogs = client.following["blogs"]
 		user.following = client.following["blogs"]
 		user.save
-		puts user.following.to_yaml
 
 		# TODO: Figure out how to get the first 100 posts
 		# Figure out how to save the data for each blog so that
 		# some library can read it later for the visualization
+		f = File.open("blogs.net", 'w+') 
 
 		for blog in user.following
-			puts client.posts(blog["name"]).to_yaml
+			#client.posts(blog["name"]).to_yaml
+			f.write(blog["name"] + "\n")
 		end
+		f.close
 
     redirect_to root_url, :notice => "Signed in!"  
   end  
