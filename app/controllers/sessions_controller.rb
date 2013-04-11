@@ -24,7 +24,7 @@ class SessionsController < ApplicationController
 		agent.follow_meta_refresh = true
 
 		blogs = client.following["blogs"]
-		user.following = client.following["blogs"]
+		user.following = blogs
 		user.save
 
 		# TODO: Figure out how to get the first 100 posts
@@ -40,26 +40,23 @@ class SessionsController < ApplicationController
 		# this would also be a measurement of how influential you are
 		# how many of the people that could possibly be affected by a post are actually
 		# being influenced by a post (at least in terms of likes/reblogs)? 
-		3.times do |j|
-			for blog in user.following(:offset => j * 21)
-				puts "analyzing: " + blog["name"]
-				5.times do |i|
-					posts = client.posts(blog["name"], :limit => 20, :offset => i*20)
-					posts = posts["posts"]
-					f.write(blog["name"] + "\n")
-					for post in posts
-						doc = Nokogiri::HTML(open(post["short_url"]))
-						#puts doc.css('div#post_notes').to_yaml
-						#puts doc.to_html
-						#puts post["notes_info"]
-						all_posts.push("\t"+ post["short_url"] + "\n")
-					end
+		for blog in user.following
+			puts "analyzing: " + blog["name"]
+			f.write(blog["name"] + "\n")
+			5.times do |i|
+				posts = client.posts(blog["name"], :limit => 20, :offset => i*20)
+				posts = posts["posts"]
+				for post in posts
+					doc = Nokogiri::HTML(open(post["short_url"]))
+					#puts doc.css('div#post_notes').to_yaml
+					#puts doc.to_html
+					#puts post["notes_info"]
+					all_posts.push("\t"+ post["short_url"] + "\n")
 				end
-				f.write(all_posts)
-				all_posts = Array.new
 			end
+			f.write(all_posts)
+			all_posts = Array.new
 		end
-
 		f.close
 	
 
