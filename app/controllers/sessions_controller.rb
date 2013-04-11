@@ -53,7 +53,7 @@ class SessionsController < ApplicationController
 						#puts doc.css('div#post_notes').to_yaml
 						#puts doc.to_html
 						#puts post["notes_info"]
-						all_posts.push("\t"+ post["short_url"] "\n")
+						all_posts.push("\t"+ post["short_url"] + "\n")
 					end
 				end
 				f.write(all_posts)
