@@ -33,7 +33,6 @@ class SessionsController < ApplicationController
 		# some library can read it later for the visualization
 		f = File.open("blogs.net", 'w+') 
 		all_posts = Array.new
-		posts.push
 		
 
 		# look at the efficiency in terms of the potential viewers based on the 
