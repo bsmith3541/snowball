@@ -23,14 +23,16 @@ class SessionsController < ApplicationController
 		agent.follow_meta_refresh = true
 
 		blogs = client.following["blogs"]
+		user.following = client.following["blogs"]
+		user.save
+		puts user.following.to_yaml
 
-		for blog in blogs
+		# TODO: Figure out how to get the first 100 posts
+		# Figure out how to save the data for each blog so that
+		# some library can read it later for the visualization
+
+		for blog in user.following
 			puts client.posts(blog["name"]).to_yaml
-			puts
-			puts
-			puts
-			puts
-			puts
 		end
 
     redirect_to root_url, :notice => "Signed in!"  
