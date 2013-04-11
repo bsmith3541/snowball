@@ -27,6 +27,7 @@ class SessionsController < ApplicationController
 		user.save
 
 		# TODO: Figure out how to get the first 100 posts
+			# right now, we're only grabbing 20 posts
 		# Figure out how to save the data for each blog so that
 		# some library can read it later for the visualization
 		f = File.open("blogs.net", 'w+') 
@@ -36,7 +37,7 @@ class SessionsController < ApplicationController
 			posts = posts["posts"]
 			f.write(blog["name"] + "\n")
 			for post in posts
-				f.write("\t" + post["slug"] + "\n")
+				f.write("\t" + post["short_url"] + "\n")
 			end
 		end
 		f.close
