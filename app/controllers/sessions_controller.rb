@@ -32,8 +32,12 @@ class SessionsController < ApplicationController
 		f = File.open("blogs.net", 'w+') 
 
 		for blog in user.following
-			#client.posts(blog["name"]).to_yaml
+			posts = client.posts(blog["name"])
+			posts = posts["posts"]
 			f.write(blog["name"] + "\n")
+			for post in posts
+				f.write("\t" + post["slug"] + "\n")
+			end
 		end
 		f.close
 
