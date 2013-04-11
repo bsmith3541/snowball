@@ -12,8 +12,26 @@ class SessionsController < ApplicationController
 		end
 
 		client = Tumblr::Client.new
-		puts client.info		
-		puts client.following
+		# displaying user data
+		# puts client.info		
+		# puts client.following
+
+		# Mechanize code
+
+		agent = Mechanize.new
+		agent.user_agent_alias = "Mac Safari"
+		agent.follow_meta_refresh = true
+
+		blogs = client.following["blogs"]
+
+		for blog in blogs
+			puts client.posts(blog["name"]).to_yaml
+			puts
+			puts
+			puts
+			puts
+			puts
+		end
 
     redirect_to root_url, :notice => "Signed in!"  
   end  
