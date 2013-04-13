@@ -48,6 +48,9 @@ class SessionsController < ApplicationController
 				posts = posts["posts"]
 				for post in posts
 					doc = Nokogiri::HTML(open(post["short_url"]))
+					doc.css('ol.notes').each do |node|
+					  puts node.text
+					end
 					#puts doc.css('div#post_notes').to_yaml
 					#puts doc.to_html
 					#puts post["notes_info"]
