@@ -31,7 +31,6 @@ class SessionsController < ApplicationController
 		blogs = []
 		((numFollowing/20.0).ceil).times do |i|
 			x = client.following(:offset => i*20)["blogs"]
-			logger.info x
 			blogs.concat x
 		end
 		user.following = blogs
@@ -56,10 +55,12 @@ class SessionsController < ApplicationController
 			reblogs = 0
 			puts "analyzing: " + blog["name"]
 			f.write(blog["name"] + "\n")
+			# Each of these should be started in 5 separate processes
 			5.times do |i|
-				posts = client.posts(blog["name"], { :limit => 20, :offset => i*20})
+				posts = client.posts(blog["name"], :offset => i*20)
 				posts = posts["posts"]
 				for post in posts
+					f.write(post["short_url"] + "\n")
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css('ol.notes').each do |node|
 						node.css('li.like').each do |note|
@@ -69,15 +70,11 @@ class SessionsController < ApplicationController
 							reblogger = note.get_attribute("class")
 							matches = reblogger.match("/tumblelog_(\S*)/")
 							# index 0 is the whole pattern that was matched
-							puts reblogger
-							if(matches)
-								first = matches[1] # this is the first () group
-								puts "#{first}"
-							end
+							puts "RB:" + reblogger
+							f.write ( "\t" + note.at_css("span .tumblelog")+ " " + note.at_css("span .source_tumblelog") + "\n")
 							reblogs+=1
 						end
 					end
-					f.write("\t"+ post["short_url"] + "\n")
 				end
 			end
 			puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
