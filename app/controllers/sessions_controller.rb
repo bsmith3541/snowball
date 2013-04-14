@@ -14,8 +14,6 @@ class SessionsController < ApplicationController
 
 		client = Tumblr::Client.new
 		# displaying user data
-		# puts client.info		
-		# puts client.following
 
 		# Mechanize code
 
@@ -58,10 +56,11 @@ class SessionsController < ApplicationController
 							reblogger = note.get_attribute("class")
 							matches = reblogger.match("/tumblelog_(\S*)/")
 							# index 0 is the whole pattern that was matched
-							puts reblogger
+							#puts reblogger
 							if(matches)
+								puts "there are matches!"
 								first = matches[1] # this is the first () group
-								puts "#{first}"
+								puts "reblogged by " + first
 							end
 							reblogs+=1
 						end
