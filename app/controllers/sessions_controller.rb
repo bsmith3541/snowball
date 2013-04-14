@@ -41,6 +41,8 @@ class SessionsController < ApplicationController
 		# how many of the people that could possibly be affected by a post are actually
 		# being influenced by a post (at least in terms of likes/reblogs)? 
 		for blog in user.following
+			likes = 0
+			reblogs = 0
 			puts "analyzing: " + blog["name"]
 			f.write(blog["name"] + "\n")
 			5.times do |i|
@@ -49,21 +51,28 @@ class SessionsController < ApplicationController
 				for post in posts
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css('ol.notes').each do |node|
-					  puts node.text
+						node.css('li.like').each do |note|
+							likes+=1
+						end
+						node.css('li.reblog').each do |note|
+							reblogger = note.get_attribute("class")
+							matches = reblogger.match("/tumblelog_(\S*)/")
+							# index 0 is the whole pattern that was matched
+							puts reblogger
+							if(matches)
+								first = matches[1] # this is the first () group
+								puts "#{first}"
+							end
+							reblogs+=1
+						end
 					end
-					#puts doc.css('div#post_notes').to_yaml
-					#puts doc.to_html
-					#puts post["notes_info"]
-					#all_posts.push("\t"+ post["short_url"] + "\n")
 					f.write("\t"+ post["short_url"] + "\n")
 				end
 			end
-			#f.write(all_posts)
-			#all_posts = Array.new
+			puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
 		end
 		f.close
 	
-
     redirect_to root_url, :notice => "Signed in!"  
   end  
 end  
