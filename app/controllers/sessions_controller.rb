@@ -1,19 +1,22 @@
 class SessionsController < ApplicationController  
 	require 'open-uri'
-  def create  
-    auth = request.env["omniauth.auth"]  
-    user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)  
-    session[:user_id] = user.id  
+	def create  
+		auth = request.env["omniauth.auth"]  
+		user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)  
+		session[:user_id] = user.id  
 
-    Tumblr.configure do |config|
-		  config.consumer_key = "zGwB3KqWwxJ1ZFUDxxA6yV9jQmA3aVZR3KatMyFltgg7QaCJyz"
-		  config.consumer_secret = "KyjlTSaMyEVWfzV55DfErmk6v80sSCow4g9SSgYYIkAM3U92j2"
-		  config.oauth_token = auth["extra"]["access_token"].token
-		  config.oauth_token_secret = auth["extra"]["access_token"].secret
+		logger.info(user.id)
+		Tumblr.configure do |config|
+			config.consumer_key = "zGwB3KqWwxJ1ZFUDxxA6yV9jQmA3aVZR3KatMyFltgg7QaCJyz"
+			config.consumer_secret = "KyjlTSaMyEVWfzV55DfErmk6v80sSCow4g9SSgYYIkAM3U92j2"
+			config.oauth_token = auth["extra"]["access_token"].token
+			config.oauth_token_secret = auth["extra"]["access_token"].secret
 		end
 
 		client = Tumblr::Client.new
 		# displaying user data
+		puts client.info		
+		# puts client.following
 
 		# Mechanize code
 
@@ -21,14 +24,23 @@ class SessionsController < ApplicationController
 		agent.user_agent_alias = "Mac Safari"
 		agent.follow_meta_refresh = true
 
-		blogs = client.following["blogs"]
+		# Find total number of blogs the user is following. If its more 
+		# than 20, it find 20 blogs at a time and appends the list to 
+		# the blogs variable
+		numFollowing = client.info["user"]["following"]
+		blogs = []
+		((numFollowing/20.0).ceil).times do |i|
+			x = client.following(:offset => i*20)["blogs"]
+			blogs.concat x
+		end
 		user.following = blogs
 		user.save
 
 		# TODO: Figure out how to get the first 100 posts
-			# right now, we're only grabbing 20 posts
+		# right now, we're only grabbing 20 posts. DONE
 		# Figure out how to save the data for each blog so that
 		# some library can read it later for the visualization
+		# TODO: From here (to line 76) should go into a separate thread.
 		f = File.open("blogs.net", 'w+') 
 		all_posts = Array.new
 		
@@ -38,15 +50,17 @@ class SessionsController < ApplicationController
 		# this would also be a measurement of how influential you are
 		# how many of the people that could possibly be affected by a post are actually
 		# being influenced by a post (at least in terms of likes/reblogs)? 
-		for blog in user.following
+		for blog in blogs
 			likes = 0
 			reblogs = 0
 			puts "analyzing: " + blog["name"]
 			f.write(blog["name"] + "\n")
+			# Each of these should be started in 5 separate processes
 			5.times do |i|
-				posts = client.posts(blog["name"], :limit => 20, :offset => i*20)
+				posts = client.posts(blog["name"], :offset => i*20)
 				posts = posts["posts"]
 				for post in posts
+					f.write(post["short_url"] + "\n")
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css('ol.notes').each do |node|
 						node.css('li.like').each do |note|
@@ -56,16 +70,11 @@ class SessionsController < ApplicationController
 							reblogger = note.get_attribute("class")
 							matches = reblogger.match("/tumblelog_(\S*)/")
 							# index 0 is the whole pattern that was matched
-							#puts reblogger
-							if(matches)
-								puts "there are matches!"
-								first = matches[1] # this is the first () group
-								puts "reblogged by " + first
-							end
+							puts "RB:" + reblogger
+							f.write ( "\t" + note.at_css("span .tumblelog")+ " " + note.at_css("span .source_tumblelog") + "\n")
 							reblogs+=1
 						end
 					end
-					f.write("\t"+ post["short_url"] + "\n")
 				end
 			end
 			puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
@@ -73,5 +82,5 @@ class SessionsController < ApplicationController
 		f.close
 	
     redirect_to root_url, :notice => "Signed in!"  
-  end  
+  end 
 end  
