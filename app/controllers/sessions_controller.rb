@@ -5,18 +5,17 @@ class SessionsController < ApplicationController
 		user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)  
 		session[:user_id] = user.id  
 
+		logger.info( user.id)
 		Tumblr.configure do |config|
 			config.consumer_key = "zGwB3KqWwxJ1ZFUDxxA6yV9jQmA3aVZR3KatMyFltgg7QaCJyz"
 			config.consumer_secret = "KyjlTSaMyEVWfzV55DfErmk6v80sSCow4g9SSgYYIkAM3U92j2"
-			puts config.oauth_token = auth["extra"]["access_token"].token
-			puts config.oauth_token_secret = auth["extra"]["access_token"].secret
+			config.oauth_token = auth["extra"]["access_token"].token
+			config.oauth_token_secret = auth["extra"]["access_token"].secret
 		end
 
 		client = Tumblr::Client.new
-
-		logger.info client.info
 		# displaying user data
-		# puts client.info		
+		puts client.info		
 		# puts client.following
 
 		# Mechanize code
@@ -28,10 +27,12 @@ class SessionsController < ApplicationController
 		# Find total number of blogs the user is following. If its more 
 		# than 20, it find 20 blogs at a time and appends the list to 
 		# the blogs variable
-		numFollowing = client.info["following"]
+		numFollowing = client.info["user"]["following"]
 		blogs = []
 		((numFollowing/20.0).ceil).times do |i|
-			blogs << client.following({"offset" => i*20})["blogs"]
+			x = client.following(:offset => i*20)["blogs"]
+			logger.info x
+			blogs.concat x
 		end
 		user.following = blogs
 		user.save
@@ -50,7 +51,7 @@ class SessionsController < ApplicationController
 		# this would also be a measurement of how influential you are
 		# how many of the people that could possibly be affected by a post are actually
 		# being influenced by a post (at least in terms of likes/reblogs)? 
-		for blog in user.following
+		for blog in blogs
 			likes = 0
 			reblogs = 0
 			puts "analyzing: " + blog["name"]
