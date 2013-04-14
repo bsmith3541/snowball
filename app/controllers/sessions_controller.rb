@@ -60,7 +60,7 @@ class SessionsController < ApplicationController
 				posts = client.posts(blog["name"], :offset => i*20)
 				posts = posts["posts"]
 				for post in posts
-					f.write(post["short_url"] + "\n")
+					f.write("\t" + "short_url: " + post["short_url"] + "\n")
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css('ol.notes').each do |node|
 						node.css('li.like').each do |note|
@@ -70,11 +70,12 @@ class SessionsController < ApplicationController
 							reblogger = note.get_attribute("class")
 							matches = reblogger.match("/tumblelog_(\S*)/")
 							# index 0 is the whole pattern that was matched
-							puts "RB: " + reblogger
+							#puts "RB: " + reblogger
 							reblogging = note.at_css("span .tumblelog")
 							source = note.at_css("span .source_tumblelog")
 							if(source && reblogging)
-								f.write ( "\t" + reblogging + " " + 
+								puts "#{reblogging} reblogged from #{source}"
+								f.write ("\t" + reblogging + " " + 
 									source + "\n")
 							end
 							reblogs+=1
@@ -82,7 +83,7 @@ class SessionsController < ApplicationController
 					end
 				end
 			end
-			puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
+			#puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
 		end
 		f.close
 	
