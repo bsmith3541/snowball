@@ -70,8 +70,13 @@ class SessionsController < ApplicationController
 							reblogger = note.get_attribute("class")
 							matches = reblogger.match("/tumblelog_(\S*)/")
 							# index 0 is the whole pattern that was matched
-							puts "RB:" + reblogger
-							f.write ( "\t" + note.at_css("span .tumblelog")+ " " + note.at_css("span .source_tumblelog") + "\n")
+							puts "RB: " + reblogger
+							reblogging = note.at_css("span .tumblelog")
+							source = note.at_css("span .source_tumblelog")
+							if(source && reblogging)
+								f.write ( "\t" + reblogging + " " + 
+									source + "\n")
+							end
 							reblogs+=1
 						end
 					end
