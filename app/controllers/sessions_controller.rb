@@ -57,6 +57,7 @@ class SessionsController < ApplicationController
 			f.write(blog["name"] + "\n")
 			# Each of these should be started in 5 separate processes
 			5.times do |i|
+				sleep 0.5
 				posts = client.posts(blog["name"], :offset => i*20)
 				posts = posts["posts"]
 				for post in posts
@@ -71,7 +72,7 @@ class SessionsController < ApplicationController
 							matches = reblogger.match("/tumblelog_(\S*)/")
 							# index 0 is the whole pattern that was matched
 							puts "RB:" + reblogger
-							f.write ( "\t" + note.at_css("span .tumblelog")+ " " + note.at_css("span .source_tumblelog") + "\n")
+							f.write ( "\t" + (note.at_css("span .tumblelog") || "" )+ " " + (note.at_css("span .source_tumblelog") || "") + "\n")
 							reblogs+=1
 						end
 					end
