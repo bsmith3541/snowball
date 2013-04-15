@@ -58,10 +58,14 @@ class SessionsController < ApplicationController
 			# Each of these should be started in 5 separate processes
 			5.times do |i|
 				sleep 0.5
-				posts = client.posts(blog["name"], :offset => i*20)
+				posts = client.posts(blog["name"], :offset => i*20, :reblog_info => true)
 				posts = posts["posts"]
 				for post in posts
 					f.write("\t" + "short_url: " + post["short_url"] + "\n")
+					f.write(
+					(post["reblogged_from_id"].to_s || "") + "\t" + (post["reblogged_from_url"].to_s || "") + "\t" + (post["reblogged_from_name"].to_s || "") + "\t" + (post["reblogged_from_title"].to_s || "") + "\t" + (post["reblogged_root_url"].to_s|| "") + "\t" + (post["reblogged_root_name"].to_s || "") + "\t" + (post["reblogged_root_title"].to_s || "") + "\n" )
+					
+					arr = ""
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css('ol.notes').each do |node|
 						node.css('li.like').each do |note|
@@ -71,13 +75,15 @@ class SessionsController < ApplicationController
 							reblogging = note.at_css("span .tumblelog")
 							source = note.at_css("span .source_tumblelog")
 							if(source && reblogging)
-								puts "#{reblogging} reblogged from #{source}"
-								f.write ("\t" + reblogging + " " + 
+								# puts "#{reblogging} reblogged from #{source}"
+								arr << ("\t" + reblogging + " " + 
 									source + "\n")
 							end
 							reblogs+=1
 						end
 					end
+					f.write(arr)
+					puts post["short_url"]
 				end
 			end
 			#puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
