@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
 		user = User.find_by_provider_and_uid(auth["provider"], auth["uid"]) || User.create_with_omniauth(auth)  
 		session[:user_id] = user.id  
 
-		logger.info( user.id)
+		logger.info(user.id)
 		Tumblr.configure do |config|
 			config.consumer_key = "zGwB3KqWwxJ1ZFUDxxA6yV9jQmA3aVZR3KatMyFltgg7QaCJyz"
 			config.consumer_secret = "KyjlTSaMyEVWfzV55DfErmk6v80sSCow4g9SSgYYIkAM3U92j2"
@@ -61,24 +61,26 @@ class SessionsController < ApplicationController
 				posts = client.posts(blog["name"], :offset => i*20)
 				posts = posts["posts"]
 				for post in posts
-					f.write(post["short_url"] + "\n")
+					f.write("\t" + "short_url: " + post["short_url"] + "\n")
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css('ol.notes').each do |node|
 						node.css('li.like').each do |note|
 							likes+=1
 						end
 						node.css('li.reblog').each do |note|
-							reblogger = note.get_attribute("class")
-							matches = reblogger.match("/tumblelog_(\S*)/")
-							# index 0 is the whole pattern that was matched
-							puts "RB:" + reblogger
-							f.write ( "\t" + (note.at_css("span .tumblelog") || "" )+ " " + (note.at_css("span .source_tumblelog") || "") + "\n")
+							reblogging = note.at_css("span .tumblelog")
+							source = note.at_css("span .source_tumblelog")
+							if(source && reblogging)
+								puts "#{reblogging} reblogged from #{source}"
+								f.write ("\t" + reblogging + " " + 
+									source + "\n")
+							end
 							reblogs+=1
 						end
 					end
 				end
 			end
-			puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
+			#puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
 		end
 		f.close
 	
