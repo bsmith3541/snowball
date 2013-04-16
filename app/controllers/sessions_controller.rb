@@ -98,8 +98,8 @@ class SessionsController < ApplicationController
 							likes+=1
 						end
 						node.css("li.reblog").each do |note|
-							reblogging = note.at_css("span .tumblelog")
-							source = note.at_css("span .source_tumblelog")
+							reblogging = note.at_css("span .tumblelog").content
+							source = note.at_css("span .source_tumblelog").content
 							if(source && reblogging)
 								# puts "#{reblogging} reblogged from #{source}"
 								# because this post is associated with a 
