@@ -106,8 +106,22 @@ class SessionsController < ApplicationController
 								if(posts == "\n\"posts\": [\n")
 									# this is the first post
 									posts << "{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
-									blogs << ",{\"blog_name\": \"" + source + "\", \"following\": \"false\" }"
 								else
+									puts reblogging.to_s
+									puts source.to_s
+									dup_reblog = blogs.match("\"blog_name\": \"#{reblogging}\"")
+									dup_source = blogs.match("\"blog_name\": \"#{source}\"")
+									if (dup_reblog != nil)
+										puts "============================="
+										puts "the reblogger: #{reblogging} is a duplicate!"
+										puts "============================="
+										blogs << ",{\"blog_name\": \"" + reblogging + "\", \"following\": \"false\" }"
+									elsif(dup_source != nil)
+										puts "============================="
+										puts "the source: #{source} is a duplicate!"
+										puts "============================="
+										blogs << ",{\"blog_name\": \"" + source + "\", \"following\": \"false\" }"
+									end
 									# there are posts before this one
 									posts << ",{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
 								end
