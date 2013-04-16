@@ -54,13 +54,12 @@ class SessionsController < ApplicationController
 		posts = ""
 		blogs << "{ \n\"blogs\": [\n"
 		posts << "\n\"posts\": [\n"
-		blag = blags[0, 2]
 
 		for blog in blag
 			likes = 0
 			reblogs = 0
 			puts "analyzing: " + blog["name"]
-			if(blogs == "")
+			if(blogs == "{ \n\"blogs\": [\n")
 				# for the first blog added
 				blogs << "{\"blog_name\": \"" + blog["name"] + "\", \"following\": \"true\" }"
 			else
@@ -72,11 +71,11 @@ class SessionsController < ApplicationController
 			# Each of these should be started in 5 separate processes
 			5.times do |i|
 				sleep 0.5
-				posts_array = client.posts(blog["name"], :offset => i*20, :reblog_info => true, :limit => 5)
+				posts_array = client.posts(blog["name"], :offset => i*20, :reblog_info => true)
 				posts_array = posts_array["posts"]
 				for post in posts_array
 					# posts << "short_url: " + post["short_url"] + ",\n"
-					if(posts == "")
+					if(posts == "\n\"posts\": [\n")
 						# for the first post added
 						posts << "{ \"reblogging\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
 					else
@@ -102,7 +101,7 @@ class SessionsController < ApplicationController
 							if(source && reblogging)
 								# puts "#{reblogging} reblogged from #{source}"
 								# because this post is associated with a 
-								if(posts == "")
+								if(posts == "\n\"posts\": [\n")
 									# this is the first post
 									posts << "{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
 								else
