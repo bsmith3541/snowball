@@ -34,6 +34,7 @@ class SessionsController < ApplicationController
 			blags.concat x
 		end
 		blags = client.following["blogs"];
+		blags = blags[0, 5]
 		puts blags
 		user.following = blags
 		user.save
@@ -63,12 +64,12 @@ class SessionsController < ApplicationController
 			puts "analyzing: " + blog["name"]
 			if(blogs == "{ \n\"blogs\": [\n")
 				# for the first blog added
-				blogs << "{\"blog_name\": \"" + blog["name"] + "\", \"following\": \"true\" }"
+				blogs << "{\"name\": \"" + blog["name"] + "\", \"following\": \"true\" }\n"
 			else
 				# for the rest of them
 				# we only want to add commas when we know there are blogs before the
 				# one we're about to add
-				blogs << ",{\"blog_name\": \"" + blog["name"] + "\", \"following\": \"true\" }"
+				blogs << ",{\"name\": \"" + blog["name"] + "\", \"following\": \"true\" }\n"
 			end	
 			# Each of these should be started in 5 separate processes
 			5.times do |i|
@@ -79,18 +80,18 @@ class SessionsController < ApplicationController
 					# posts << "short_url: " + post["short_url"] + ",\n"
 					if(posts == "\n\"posts\": [\n")
 						# for the first post added
-						posts << "{ \"reblogging\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
+						posts << "{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
 					else
 						# we only want to add commas when we know there are posts before the
 						# one we're about to add
-						posts << ",{ \"reblogging\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
+						posts << ",{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
 					end
 					if !post["reblogged_from_name"].nil?
 						# we only want to add commas when we know there are blogs before the
 						# one we're about to add
 						# because this blog belongs to a post within a blog, we know that
 						# there are blogs before the one we're about to add
-						blogs << ",{ \"blog_name\": \"" + post["reblogged_from_name"].to_s + "\", \"following\": \"false\"}\n"
+						blogs << ",{ \"name\": \"" + post["reblogged_from_name"].to_s + "\", \"following\": \"false\"}\n"
 					end
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css("ol.notes").each do |node|
@@ -107,25 +108,25 @@ class SessionsController < ApplicationController
 								# because this post is associated with a 
 								if(posts == "\n\"posts\": [\n")
 									# this is the first post
-									posts << "{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
+									posts << "{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
 								else
 									puts reblogging.to_s
 									puts source.to_s
-									dup_reblog = blogs.match("\"blog_name\": \"#{reblogging}\"")
-									dup_source = blogs.match("\"blog_name\": \"#{source}\"")
+									dup_reblog = blogs.match("\"name\": \"#{reblogging}\"")
+									dup_source = blogs.match("\"name\": \"#{source}\"")
 									if (dup_reblog == nil)
 										puts "============================="
 										puts "the reblogger: #{reblogging} is NOT a duplicate!"
 										puts "============================="
-										blogs << ",{\"blog_name\": \"" + reblogging + "\", \"following\": \"false\" }"
+										blogs << ",{\"name\": \"" + reblogging + "\", \"following\": \"false\" }"
 									elsif(dup_source == nil)
 										puts "============================="
 										puts "the source: #{source} is NOT a duplicate!"
 										puts "============================="
-										blogs << ",{\"blog_name\": \"" + source + "\", \"following\": \"false\" }"
+										blogs << ",{\"name\": \"" + source + "\", \"following\": \"false\" }\n"
 									end
 									# there are posts before this one
-									posts << ",{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
+									posts << ",{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
 								end
 							end
 							reblogs+=1
