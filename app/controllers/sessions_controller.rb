@@ -41,7 +41,7 @@ class SessionsController < ApplicationController
 		# Figure out how to save the data for each blog so that
 		# some library can read it later for the visualization
 		# TODO: From here (to line 76) should go into a separate thread.
-		f = File.open("blogs.net", "w+") 
+		f = File.open("blogs.json", "w+") 
 		all_posts = Array.new
 		
 
@@ -55,7 +55,7 @@ class SessionsController < ApplicationController
 		blogs << "{ \n\"blogs\": [\n"
 		posts << "\n\"posts\": [\n"
 
-		for blog in blag
+		for blog in blags
 			likes = 0
 			reblogs = 0
 			puts "analyzing: " + blog["name"]
