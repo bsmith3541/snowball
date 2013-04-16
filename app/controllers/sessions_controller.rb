@@ -60,7 +60,15 @@ class SessionsController < ApplicationController
 			likes = 0
 			reblogs = 0
 			puts "analyzing: " + blog["name"]
-			blogs << "{ \"blog_name\": \"" + blog["name"] + "\", \"following\": \"true\" },\n"
+			if(blogs == "")
+				# for the first blog added
+				blogs << "{\"blog_name\": \"" + blog["name"] + "\", \"following\": \"true\" }"
+			else
+				# for the rest of them
+				# we only want to add commas when we know there are blogs before the
+				# one we're about to add
+				blogs << ",{\"blog_name\": \"" + blog["name"] + "\", \"following\": \"true\" }"
+			end	
 			# Each of these should be started in 5 separate processes
 			5.times do |i|
 				sleep 0.5
@@ -68,9 +76,20 @@ class SessionsController < ApplicationController
 				posts_array = posts_array["posts"]
 				for post in posts_array
 					# posts << "short_url: " + post["short_url"] + ",\n"
-					posts << "{ \"reblogging\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"},\n"
+					if(posts == "")
+						# for the first post added
+						posts << "{ \"reblogging\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
+					else
+						# we only want to add commas when we know there are posts before the
+						# one we're about to add
+						posts << ",{ \"reblogging\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
+					end
 					if !post["reblogged_from_name"].nil?
-						blogs << "{ \"blog_name\": \"" + post["reblogged_from_name"].to_s + "\", \"following\": \"false\"},\n"
+						# we only want to add commas when we know there are blogs before the
+						# one we're about to add
+						# because this blog belongs to a post within a blog, we know that
+						# there are blogs before the one we're about to add
+						blogs << ",{ \"blog_name\": \"" + post["reblogged_from_name"].to_s + "\", \"following\": \"false\"}\n"
 					end
 					doc = Nokogiri::HTML(open(post["short_url"]))
 					doc.css("ol.notes").each do |node|
@@ -82,7 +101,14 @@ class SessionsController < ApplicationController
 							source = note.at_css("span .source_tumblelog")
 							if(source && reblogging)
 								# puts "#{reblogging} reblogged from #{source}"
-								posts << "{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"},\n"
+								# because this post is associated with a 
+								if(posts == "")
+									# this is the first post
+									posts << "{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
+								else
+									# there are posts before this one
+									posts << ",{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
+								end
 							end
 							reblogs+=1
 						end
