@@ -111,14 +111,14 @@ class SessionsController < ApplicationController
 									puts source.to_s
 									dup_reblog = blogs.match("\"blog_name\": \"#{reblogging}\"")
 									dup_source = blogs.match("\"blog_name\": \"#{source}\"")
-									if (dup_reblog != nil)
+									if (dup_reblog == nil)
 										puts "============================="
-										puts "the reblogger: #{reblogging} is a duplicate!"
+										puts "the reblogger: #{reblogging} is NOT a duplicate!"
 										puts "============================="
 										blogs << ",{\"blog_name\": \"" + reblogging + "\", \"following\": \"false\" }"
-									elsif(dup_source != nil)
+									elsif(dup_source == nil)
 										puts "============================="
-										puts "the source: #{source} is a duplicate!"
+										puts "the source: #{source} is NOT a duplicate!"
 										puts "============================="
 										blogs << ",{\"blog_name\": \"" + source + "\", \"following\": \"false\" }"
 									end
