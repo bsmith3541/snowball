@@ -15,7 +15,7 @@ class SessionsController < ApplicationController
 
 		client = Tumblr::Client.new
 		# displaying user data
-		puts client.info		
+		# puts client.info		
 		# puts client.following
 
 		# Mechanize code
@@ -33,6 +33,8 @@ class SessionsController < ApplicationController
 			x = client.following(:offset => i*20)["blogs"]
 			blags.concat x
 		end
+		blags = client.following["blogs"];
+		puts blags
 		user.following = blags
 		user.save
 
@@ -104,6 +106,7 @@ class SessionsController < ApplicationController
 								if(posts == "\n\"posts\": [\n")
 									# this is the first post
 									posts << "{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
+									blogs << ",{\"blog_name\": \"" + source + "\", \"following\": \"false\" }"
 								else
 									# there are posts before this one
 									posts << ",{ \"reblogging\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
