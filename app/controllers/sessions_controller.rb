@@ -34,7 +34,7 @@ class SessionsController < ApplicationController
 			blags.concat x
 		end
 		blags = client.following["blogs"];
-		blags = blags[0, 1]
+		# blags = blags[0, 1]
 		# puts blags
 		user.following = blags
 		user.save
@@ -56,7 +56,7 @@ class SessionsController < ApplicationController
 		blogs = ""
 		posts = ""
 		blogs << "{ \n\"blogs\": [\n"
-		posts << "\n\"posts\": [\n"
+		posts << "\n\"links\": [\n"
 
 		for blog in blags
 			likes = 0
@@ -82,13 +82,13 @@ class SessionsController < ApplicationController
 						# for the first post added
 						posts << "{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + 
 						 "\", \"type\": \"" + post["type"] + 
-						 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
+						 "\", \"tags\": \"" + post["tags"].join(", ").to_s + "\"}\n"
 					else
 						# we only want to add commas when we know there are posts before the
 						# one we're about to add
 						posts << ",{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + 
 						 "\", \"type\": \"" + post["type"] + 
-						 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
+						 "\", \"tags\": \"" + post["tags"].join(", ").to_s + "\"}\n"
 					end
 					if !post["reblogged_from_name"].nil?
 						# we only want to add commas when we know there are blogs before the
@@ -103,7 +103,9 @@ class SessionsController < ApplicationController
 							likes+=1
 						end
 						node.css("li.reblog").each do |note|
-							reblogging = note.at_css("span .tumblelog").content
+							if (reblogging = note.at_css("span .tumblelog"))
+								reblogging = note.at_css("span .tumblelog").content
+							end
 							if (source = note.at_css("span .source_tumblelog"))
 								source = note.at_css("span .source_tumblelog").content
 							end
@@ -114,7 +116,7 @@ class SessionsController < ApplicationController
 									# this is the first post
 									posts << "{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + 
 										 "\", \"type\": \"" + post["type"] + 
-										 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
+										 "\", \"tags\": \"" + post["tags"].join(", ").to_s + "\"}\n"
 								else
 									# puts reblogging.to_s
 									# puts source.to_s
@@ -134,7 +136,7 @@ class SessionsController < ApplicationController
 									# there are posts before this one
 									posts << ",{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + 
 										 "\", \"type\": \"" + post["type"] + 
-										 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
+										 "\", \"tags\": \"" + post["tags"].join(", ").to_s + "\"}\n"
 								end
 							end
 							reblogs+=1

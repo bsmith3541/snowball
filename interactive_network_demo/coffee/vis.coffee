@@ -528,5 +528,5 @@ $ ->
     searchTerm = $(this).val()
     myNetwork.updateSearch(searchTerm)
 
-  d3.json "data/b.json", (json) ->
+  d3.json "data/cy.json", (json) ->
     myNetwork("#vis", json)
