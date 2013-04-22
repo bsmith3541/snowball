@@ -34,8 +34,8 @@ class SessionsController < ApplicationController
 			blags.concat x
 		end
 		blags = client.following["blogs"];
-		blags = blags[0, 5]
-		puts blags
+		blags = blags[0, 1]
+		# puts blags
 		user.following = blags
 		user.save
 
@@ -80,11 +80,15 @@ class SessionsController < ApplicationController
 					# posts << "short_url: " + post["short_url"] + ",\n"
 					if(posts == "\n\"posts\": [\n")
 						# for the first post added
-						posts << "{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
+						posts << "{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + 
+						 "\", \"type\": \"" + post["type"] + 
+						 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
 					else
 						# we only want to add commas when we know there are posts before the
 						# one we're about to add
-						posts << ",{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + "\"}\n"
+						posts << ",{ \"target\": \""+ blog["name"] + "\", \"source\": \"" + (post["reblogged_from_name"].to_s || "") + 
+						 "\", \"type\": \"" + post["type"] + 
+						 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
 					end
 					if !post["reblogged_from_name"].nil?
 						# we only want to add commas when we know there are blogs before the
@@ -108,31 +112,35 @@ class SessionsController < ApplicationController
 								# because this post is associated with a 
 								if(posts == "\n\"posts\": [\n")
 									# this is the first post
-									posts << "{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
+									posts << "{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + 
+										 "\", \"type\": \"" + post["type"] + 
+										 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
 								else
-									puts reblogging.to_s
-									puts source.to_s
+									# puts reblogging.to_s
+									# puts source.to_s
 									dup_reblog = blogs.match("\"name\": \"#{reblogging}\"")
 									dup_source = blogs.match("\"name\": \"#{source}\"")
 									if (dup_reblog == nil)
-										puts "============================="
-										puts "the reblogger: #{reblogging} is NOT a duplicate!"
-										puts "============================="
-										blogs << ",{\"name\": \"" + reblogging + "\", \"following\": \"false\" }"
+										# puts "============================="
+										# puts "the reblogger: #{reblogging} is NOT a duplicate!"
+										# puts "============================="
+										blogs << ",{\"name\": \"" + reblogging + "\", \"following\": \"false\" }\n"
 									elsif(dup_source == nil)
-										puts "============================="
-										puts "the source: #{source} is NOT a duplicate!"
-										puts "============================="
+										# puts "============================="
+										# puts "the source: #{source} is NOT a duplicate!"
+										# puts "============================="
 										blogs << ",{\"name\": \"" + source + "\", \"following\": \"false\" }\n"
 									end
 									# there are posts before this one
-									posts << ",{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + "\"}\n"
+									posts << ",{ \"target\": \"" + reblogging + "\", \"source\": \"" + source + 
+										 "\", \"type\": \"" + post["type"] + 
+										 "\", \"tags\": \"" + post["tags"].to_s + "\"}\n"
 								end
 							end
 							reblogs+=1
 						end
 					end
-					puts post["short_url"]
+					# puts post["short_url"]
 				end
 			end
 			#puts " #{blog["name"]} has #{likes} likes and #{reblogs} reblogs"
