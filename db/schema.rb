@@ -11,7 +11,24 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130411043731) do
+ActiveRecord::Schema.define(:version => 20130503193601) do
+
+  create_table "blogs", :force => true do |t|
+    t.boolean  "following"
+    t.string   "name"
+    t.integer  "size",       :default => 0
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
+  create_table "posts", :force => true do |t|
+    t.string   "target"
+    t.string   "source"
+    t.string   "type_of_post"
+    t.string   "tags"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
 
   create_table "users", :force => true do |t|
     t.string   "provider"

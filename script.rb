@@ -7,12 +7,13 @@ end
 
 x["nodes"].each do |blob|
 	blob["match"] = 1.0
-	blob["id"] = blob['name'].downcase.tr(' ', '_')
-	if blob["following"] == "true"
-		blob["playcount"] = 100
-	else
-		blob["playcount"] = 5
-	end
+	blob["id"] = blob["name"].downcase.tr(' ', '_')
+	# if blob["following"] == "true"
+	# 	blob["playcount"] = 100
+	# else
+	# 	blob["playcount"] = 5
+	# end
+	blob["playcount"] = blob["size"]
 	blob["artist"] = "Me"
 end
 
@@ -29,7 +30,7 @@ x["links"].each do |blob|
 			x["nodes"] << ({ "match" => "1.0",
 								"id" => blob['target'].downcase.tr(' ', '_'),
 								"playcount" => 5,
-								"artist" => "Me",
+								"artist" => "New",
 								"name" => blob['target'],
 								"following" => "false"})
 		end
@@ -40,7 +41,7 @@ x["links"].each do |blob|
 			x["nodes"] << ({ "match" => "1.0",
 								"id" => blob['source'].downcase.tr(' ', '_'),
 								"playcount" => 5,
-								"artist" => "Me",
+								"artist" => "New",
 								"name" => blob['source'],
 								"following" => "false"})
 		end
