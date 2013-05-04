@@ -25,26 +25,22 @@ x["links"].each do |blob|
 		puts i
 	end
 	sel = x["nodes"].select { |i| i["name"] == blob["target"] }
-	if blob["target"]
-		if sel.empty?
-			x["nodes"] << ({ "match" => "1.0",
-								"id" => blob['target'].downcase.tr(' ', '_'),
-								"playcount" => 5,
-								"artist" => "New",
-								"name" => blob['target'],
-								"following" => "false"})
-		end
+	if sel.empty?
+		x["nodes"] << ({ "match" => 1.0,
+							"id" => blob['target'].downcase.tr(' ', '_'),
+							"playcount" => 1,
+							"artist" => "New",
+							"name" => blob['target'],
+							"following" => "false"})
 	end
-	if blob["target"]
-		sel = x["nodes"].select { |i| i["name"] == blob["source"] }
-		if sel.empty?
-			x["nodes"] << ({ "match" => "1.0",
-								"id" => blob['source'].downcase.tr(' ', '_'),
-								"playcount" => 5,
-								"artist" => "New",
-								"name" => blob['source'],
-								"following" => "false"})
-		end
+	sel = x["nodes"].select { |i| i["name"] == blob["source"] }
+	if sel.empty?
+		x["nodes"] << ({ "match" => 1.0,
+							"id" => blob['source'].downcase.tr(' ', '_'),
+							"playcount" => 1,
+							"artist" => "New",
+							"name" => blob['source'],
+							"following" => "false"})
 	end
 end
 

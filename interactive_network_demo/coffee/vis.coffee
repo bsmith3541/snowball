@@ -264,9 +264,12 @@ Network = () ->
 
     # id's -> node objects
     nodesMap  = mapNodes(data.nodes)
-
+    j = 0
+    debugger
     # switch links to point to node objects instead of id's
     data.links.forEach (l) ->
+      console.log(l.source)
+      console.log(l.target)
       l.source = nodesMap.get(l.source)
       l.target = nodesMap.get(l.target)
       # linkedByIndex is used for link sorting
@@ -528,5 +531,5 @@ $ ->
     searchTerm = $(this).val()
     myNetwork.updateSearch(searchTerm)
 
-  d3.json "data/test.json", (json) ->
+  d3.json "data/testa.json", (json) ->
     myNetwork("#vis", json)

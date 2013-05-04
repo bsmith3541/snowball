@@ -35,7 +35,6 @@ class SessionsController < ApplicationController
 			blags.concat x
 		end
 		blags = client.following["blogs"];
-		blags = blags[0, 1]
 		puts blags
 		user.following = blags
 		user.save
@@ -70,35 +69,22 @@ class SessionsController < ApplicationController
 			# 	blogs << ",{\"name\": \"" + blog["name"] + "\", \"following\": \"true\" }\n"
 			# end	
 			# Each of these should be started in 5 separate processes
-			1.times do |i|
+			5.times do |i|
 				sleep 0.1
 				posts_array = client.posts(blog["name"], :offset => i*20, :reblog_info => true)
 				posts_array = posts_array["posts"]
 				for post in posts_array
 					# posts << "short_url: " + post["short_url"] + ",\n"
-					Post.create(target: blog['name'], source: post["reblogged_from_name"].to_s || "", type_of_post: post['type'], tags: post['tags'].join(',').to_s)
+					if post["reblogged_from_name"].to_s == ""
+						source  =  blog['name']
+					else
+						source = post["reblogged_from_name"].to_s
+					end
+					Post.create(target: blog['name'], source: source, type_of_post: post['type'], tags: post['tags'].join(',').to_s)
 					unless post["reblogged_from_name"].nil?
 						Blog.create(name: post["reblogged_from_name"].to_s, following: "false")
 					end
 					doc = Nokogiri::HTML(open(post["short_url"]))
-
-					# FUCK STACK OVERFLOW says mechanize can't work with JS or AJAX
-					page = agent.get(post["short_url"])
-					getmore_link = page.link_with(text: "Show more notes")
-					puts page.links.count
-					while  !getmore_link.nil?
-						getmore_link.click
-						getmore_link = page.link_with(text: "Show more notes")
-						puts "one more"
-						puts page.links.count
-					end
-					puts "got all links"
-					g = File.open("nodes.json", "w+") 
-					g.write(page)
-					g.close
-					return
-
-
 					doc.css("ol.notes").each do |node|
 						node.css("li.like").each do |note|
 							likes += 1
