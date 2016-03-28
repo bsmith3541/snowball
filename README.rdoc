@@ -1,8 +1,8 @@
 What up homies?
 
-Snowball is a web crawler that scans the user's Tumblr profile to verify the Tumblr "circle jerk" once and for all. Uncovering the circle jerk is the main motivation for this application; should the theory prove wrong, this crawler will at least tell you which blogs have the most influence on you by visualizing where most of your personalized content comes from.
+Snowball is a web crawler that scans the user's Tumblr profile to verify the Tumblr "inner circle" once and for all. Uncovering the inner circle is the main motivation for this application; should the theory prove wrong, this crawler will at least tell you which blogs have the most influence on you by visualizing where most of your personalized content comes from.
 
-What's the Tumblr "circle jerk"?
+What's the Tumblr "inner circle"?
 
-There's a theory that most of the users on Tumblr are merely reblogging the real originators of the content. 
+There's a theory that most of the users on Tumblr are merely reblogging the real originators of the content and are much more likely to interact with content that comes from the people they already follow.
 
